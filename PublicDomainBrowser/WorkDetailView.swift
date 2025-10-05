@@ -25,11 +25,14 @@ struct WorkDetailView: View {
                             .frame(maxWidth: .infinity)
                     }
                 }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(work.coverArtURL != nil ? "Cover art for \(work.title)" : "Cover art not available")
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text(work.title)
                         .font(.title)
                         .bold()
+                        .accessibilityAddTraits(.isHeader)
                     if let subtitle = work.subtitle, !subtitle.isEmpty {
                         Text(subtitle)
                             .font(.title3)
@@ -49,6 +52,7 @@ struct WorkDetailView: View {
                         .padding()
                         .background(Color.accentColor.opacity(0.1))
                         .cornerRadius(12)
+                        .accessibilityHint("Opens \(work.title) on openlibrary.org")
                 }
             }
             .padding()

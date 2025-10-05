@@ -37,6 +37,26 @@ struct OpenLibraryWork: Decodable, Identifiable, Hashable {
         return String(year)
     }
 
+    var accessibilitySummary: String {
+        var components: [String] = [title]
+
+        if let authors = authorName, !authors.isEmpty {
+            let rendered = authors
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+
+            if !rendered.isEmpty {
+                components.append("by " + rendered.joined(separator: ", "))
+            }
+        }
+
+        if let year = firstPublishYear {
+            components.append("first published \(year)")
+        }
+
+        return components.joined(separator: ", ")
+    }
+
     var workURL: URL? {
         URL(string: "https://openlibrary.org" + key)
     }

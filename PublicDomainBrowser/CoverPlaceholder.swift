@@ -16,5 +16,6 @@ struct CoverPlaceholder: View {
                     .foregroundStyle(.secondary)
             }
             .frame(width: size.width, height: size.height)
+            .accessibilityHidden(true)
     }
 }
