@@ -55,7 +55,7 @@ struct ContentView: View {
                 WorkDetailView(work: work)
             }
         }
-        .searchable(text: $viewModel.query, isPresented: $isSearchFieldFocused, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search books, authors, or subjects")
+        .searchable(text: $viewModel.query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search books, authors, or subjects")
         .onSubmit(of: .search) {
             viewModel.submitSearch()
         }
