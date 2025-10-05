@@ -15,6 +15,7 @@ struct ContentView: View {
                         Image(systemName: "exclamationmark.triangle")
                             .font(.largeTitle)
                             .foregroundStyle(.orange)
+                            .accessibilityHidden(true)
                         Text(message)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
@@ -28,12 +29,14 @@ struct ContentView: View {
                         Image(systemName: "books.vertical")
                             .font(.system(size: 48))
                             .foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
                         Text("Search millions of titles in the public domain.")
                             .font(.headline)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .accessibilityElement(children: .combine)
                 } else {
                     List(viewModel.results) { work in
                         NavigationLink(value: work) {
@@ -81,6 +84,7 @@ private struct SearchResultRow: View {
                     CoverPlaceholder()
                 }
             }
+            .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 4) {
                 Text(work.title)
                     .font(.headline)
@@ -100,6 +104,9 @@ private struct SearchResultRow: View {
             }
         }
         .padding(.vertical, 8)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(work.accessibilitySummary)
+        .accessibilityHint("Opens book details")
     }
 }
 
