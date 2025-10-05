@@ -1,10 +1,12 @@
 import SwiftUI
+import Observation
 
 struct ContentView: View {
-    @StateObject private var viewModel = SearchViewModel()
+    @State private var viewModel = SearchViewModel()
     @FocusState private var isSearchFieldFocused: Bool
 
     var body: some View {
+        @Bindable var viewModel = viewModel
         NavigationStack {
             Group {
                 if viewModel.isLoading {

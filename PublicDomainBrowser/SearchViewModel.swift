@@ -1,14 +1,15 @@
 import Foundation
+import Observation
 
-@MainActor
-final class SearchViewModel: ObservableObject {
-    @Published var query: String = ""
-    @Published private(set) var results: [OpenLibraryWork] = []
-    @Published private(set) var isLoading: Bool = false
-    @Published var errorMessage: String?
+@Observable
+final class SearchViewModel {
+    var query: String = ""
+    private(set) var results: [OpenLibraryWork] = []
+    private(set) var isLoading: Bool = false
+    var errorMessage: String?
 
-    private let service: OpenLibraryService
-    private var searchTask: Task<Void, Never>?
+    @ObservationIgnored private let service: OpenLibraryService
+    @ObservationIgnored private var searchTask: Task<Void, Never>?
 
     init(service: OpenLibraryService = OpenLibraryService()) {
         self.service = service
