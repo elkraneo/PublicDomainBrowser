@@ -66,7 +66,8 @@ struct WorkDetailView: View {
             subtitle: "A novel",
             authorName: ["Jane Austen"],
             firstPublishYear: 1813,
-            coverID: 8231851
+            coverID: 8231851,
+            coverEditionKey: "OL47044678M"
         ))
     }
 }

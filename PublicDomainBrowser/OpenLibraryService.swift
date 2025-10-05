@@ -47,7 +47,6 @@ struct OpenLibraryService {
         }
 
         let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
 
         guard let payload = try? decoder.decode(OpenLibrarySearchResponse.self, from: data) else {
             throw ServiceError.decodingFailed
