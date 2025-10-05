@@ -3,8 +3,6 @@ import Observation
 
 struct ContentView: View {
     @State private var viewModel = SearchViewModel()
-    @FocusState private var isSearchFieldFocused: Bool
-
     var body: some View {
         @Bindable var viewModel = viewModel
         NavigationStack {
@@ -46,11 +44,6 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("Public Domain")
-            .toolbar {
-                ToolbarItem(placement: .keyboard) {
-                    Button("Done") { isSearchFieldFocused = false }
-                }
-            }
             .navigationDestination(for: OpenLibraryWork.self) { work in
                 WorkDetailView(work: work)
             }
@@ -62,7 +55,6 @@ struct ContentView: View {
         .onChange(of: viewModel.query) { _ in
             viewModel.submitSearch()
         }
-        .focused($isSearchFieldFocused)
     }
 }
 
