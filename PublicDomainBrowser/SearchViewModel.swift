@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 
+@MainActor
 @Observable
 final class SearchViewModel {
     var query: String = ""
@@ -18,22 +19,27 @@ final class SearchViewModel {
     func submitSearch() {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard trimmed.count >= 2 else {
-            searchTask?.cancel()
+            cancelOngoingSearch()
             isLoading = false
             errorMessage = trimmed.isEmpty ? nil : "Keep typing to narrow your search."
             results = []
             return
         }
 
-        searchTask?.cancel()
+        cancelOngoingSearch()
 
         searchTask = Task { [weak self] in
             guard let self else { return }
-            await performSearch(with: trimmed)
+            await self.performSearch(with: trimmed)
         }
     }
 
-    func performSearch(with query: String) async {
+    private func cancelOngoingSearch() {
+        searchTask?.cancel()
+        searchTask = nil
+    }
+
+    private func performSearch(with query: String) async {
         isLoading = true
         errorMessage = nil
 
@@ -41,9 +47,10 @@ final class SearchViewModel {
 
         do {
             let response = try await service.searchWorks(matching: query)
+            guard !Task.isCancelled else { return }
             results = response
         } catch {
-            if Task.isCancelled { return }
+            guard !Task.isCancelled else { return }
             errorMessage = (error as? LocalizedError)?.errorDescription ?? "Something went wrong."
             results = []
         }
