@@ -35,12 +35,19 @@ struct ContentView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    List(viewModel.results) { work in
-                        NavigationLink(value: work) {
-                            SearchResultRow(work: work)
+                    ScrollView {
+                        LazyVGrid(columns: gridColumns, spacing: SearchLayout.gridSpacing) {
+                            ForEach(viewModel.results) { work in
+                                NavigationLink(value: work) {
+                                    SearchResultCard(work: work)
+                                }
+                                .buttonStyle(.plain)
+                                .hoverEffect(.lift)
+                            }
                         }
                     }
-                    .listStyle(.plain)
+                    .contentMargins(.horizontal, SearchLayout.horizontalPadding)
+                    .contentMargins(.vertical, SearchLayout.verticalPadding, for: .scrollContent)
                 }
             }
             .navigationTitle("Public Domain")
@@ -48,6 +55,7 @@ struct ContentView: View {
                 WorkDetailView(work: work)
             }
         }
+        .scenePadding()
         .searchable(text: $viewModel.query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search books, authors, or subjects")
         .onSubmit(of: .search) {
             viewModel.submitSearch()
@@ -58,48 +66,82 @@ struct ContentView: View {
     }
 }
 
-private struct SearchResultRow: View {
+private enum SearchLayout {
+    static let coverSize = CGSize(width: 220, height: 320)
+    static let cardCornerRadius: CGFloat = 28
+    static let coverCornerRadius: CGFloat = 20
+    static let gridSpacing: CGFloat = 32
+    static let horizontalPadding: CGFloat = 48
+    static let verticalPadding: CGFloat = 32
+    static let minimumCardWidth: CGFloat = 280
+    static let maximumCardWidth: CGFloat = 360
+}
+
+private let gridColumns: [GridItem] = [
+    GridItem(
+        .adaptive(
+            minimum: SearchLayout.minimumCardWidth,
+            maximum: SearchLayout.maximumCardWidth
+        ),
+        spacing: SearchLayout.gridSpacing,
+        alignment: .top
+    )
+]
+
+private struct SearchResultCard: View {
     let work: OpenLibraryWork
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             AsyncImage(url: work.coverArtURL) { phase in
                 switch phase {
                 case .empty:
                     ProgressView()
-                        .frame(width: 60, height: 90)
+                        .frame(width: SearchLayout.coverSize.width, height: SearchLayout.coverSize.height)
                 case .success(let image):
                     image
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 60, height: 90)
-                        .clipped()
-                        .cornerRadius(6)
+                        .frame(width: SearchLayout.coverSize.width, height: SearchLayout.coverSize.height)
+                        .clipShape(RoundedRectangle(cornerRadius: SearchLayout.coverCornerRadius, style: .continuous))
                 case .failure:
-                    CoverPlaceholder()
+                    CoverPlaceholder(width: SearchLayout.coverSize.width, height: SearchLayout.coverSize.height)
+                        .clipShape(RoundedRectangle(cornerRadius: SearchLayout.coverCornerRadius, style: .continuous))
                 @unknown default:
-                    CoverPlaceholder()
+                    CoverPlaceholder(width: SearchLayout.coverSize.width, height: SearchLayout.coverSize.height)
+                        .clipShape(RoundedRectangle(cornerRadius: SearchLayout.coverCornerRadius, style: .continuous))
                 }
             }
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(work.title)
-                    .font(.headline)
-                    .lineLimit(2)
+                    .font(.title3.weight(.semibold))
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(3)
                 if let subtitle = work.subtitle?.trimmingCharacters(in: .whitespacesAndNewlines), !subtitle.isEmpty {
                     Text(subtitle)
-                        .font(.subheadline)
+                        .font(.headline)
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
                 }
                 Text(work.displayAuthors)
-                    .font(.subheadline)
+                    .font(.headline)
                     .foregroundStyle(.secondary)
+                    .lineLimit(2)
                 Text(work.displayYear)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.subheadline)
+                    .foregroundStyle(.tertiary)
+                    .lineLimit(1)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.vertical, 8)
+        .padding(24)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background {
+            RoundedRectangle(cornerRadius: SearchLayout.cardCornerRadius, style: .continuous)
+                .fill(.thinMaterial)
+                .shadow(radius: 4, y: 6)
+        }
+        .glassBackgroundEffect(in: .rect(cornerRadius: SearchLayout.cardCornerRadius))
     }
 }
 
